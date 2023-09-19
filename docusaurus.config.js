@@ -19,7 +19,7 @@ const config = {
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'zoomexglobal', // Usually your GitHub org/user name.
-  projectName: 'docs-test', // Usually your repo name.
+  projectName: 'docs-tes', // Usually your repo name.
 
   trailingSlash: false,
   onBrokenLinks: 'throw',
