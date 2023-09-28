@@ -4,7 +4,7 @@ sidebar_label: Get Open Orders (real-time)
 sidebar_position: 4
 ---
 Query unfilled or partially filled orders in **real-time**. To query older order records, please use the [order history](order-list#) interface.
-> **Normal account covers: Spot / USDT perpetual / Inverse contract**
+> **Normal account covers:  USDT perpetual / Inverse contract**
 
 :::tip
 - It also supports querying filled, cancelled, and rejected orders which occurred in last 10 minutes (check the `openOnly` param). At most, 500 orders will be returned.
@@ -63,7 +63,7 @@ GET `/cloud/trade/v3/order/realtime`
 |> triggerPrice |string |Trigger price. If `stopOrderType`=_TrailingStop_, it is activate price. Otherwise, it is trigger price|
 |> takeProfit |string |Take profit price |
 |> stopLoss |string |Stop loss price |
-|> tpslMode |string |TP/SL mode, `Full`: entire position for TP/SL. `Partial`: partial position tp/sl. Spot does not have this field, and Option returns always "" |
+|> tpslMode |string |TP/SL mode, `Full`: entire position for TP/SL. `Partial`: partial position tp/sl. |
 |> tpLimitPrice |string |The limit order price when take profit price is triggered|
 |> slLimitPrice |string |The limit order price when stop loss price is triggered|
 |> [tpTriggerBy](../enum#triggerby) |string |The price type to trigger take profit |
