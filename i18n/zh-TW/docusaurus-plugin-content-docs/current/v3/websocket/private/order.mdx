@@ -18,8 +18,6 @@ sidebar_position: 3
 |> category |string |產品類型 <ul><li>普通帳戶: `linear`, `inverse`.</li></ul>|
 |> orderId  |string |訂單ID |
 |> orderLinkId |string |用戶自定義ID |
-|> isLeverage |string |是否借貸. |
-|> blockTradeId  |string |大宗交易訂單Id |
 |> symbol |string |合約名稱 |
 |> price |string |訂單價格 |
 |> qty |string |訂單數量 |
@@ -109,7 +107,7 @@ client.on('pong', function (data, flags) {
     "creationTime": 1672364262474,
     "data": [
         {
-            "symbol": "ETH-30DEC22-1400-C",
+            "symbol": "ETHUSDT",
             "orderId": "5cf98598-39a7-459e-97bf-76ca765ee020",
             "side": "Sell",
             "orderType": "Market",
