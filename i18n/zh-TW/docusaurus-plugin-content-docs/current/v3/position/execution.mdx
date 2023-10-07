@@ -21,8 +21,6 @@ GET `/cloud/trade/v3/execution/list`
 |[category](../enum#category) |**true** |string |產品類型 <ul><li>普通帳戶: `linear`, `inverse`</li></ul> |
 |symbol |false |string |合約名稱 |
 |orderId |false |string |訂單Id |
-|orderLinkId |false |string |用戶自定義訂單id. 普通帳戶不支持該字段查詢 |
-|baseCoin |false |string |交易幣種. |
 |startTime |false |integer |開始時間戳 (毫秒)|
 |endTime |false |integer |結束時間戳 (毫秒)|
 |[execType](../enum#exectype) |false |string |執行類型.|
@@ -80,7 +78,7 @@ X-BAPI-RECV-WINDOW: 5000
         "category": "linear",
         "list": [
             {
-                "symbol": "ETHPERP",
+                "symbol": "ETHUSDT",
                 "orderType": "Market",
                 "orderLinkId": "",
                 "side": "Buy",
