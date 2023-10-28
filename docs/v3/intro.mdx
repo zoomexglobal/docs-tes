@@ -54,101 +54,65 @@ To assist in diagnosing advanced network problems, you may consider adding `cdn-
 
 **Basic steps:**
 
-1. Concatenate all the public parameters in the [query string](https://en.wikipedia.org/wiki/Query_string) format. The parameters must be ordered in **alphabetical** order. This will be used to generate the `sign`.
+1. timestamp + API key + (recv_window) + (queryString | jsonBodyString)
 
-   - For example
+2. Use the HMAC_SHA256 or RSA_SHA256 algorithm to sign the string in step 1, and convert it to a hex string (HMAC_SHA256) / base64 (RSA_SHA256) to obtain the sign parameter.
 
-     ``` shell
-     orderedParams = "api_key=XXXXXXXXXXX&buy_leverage=100&sell_leverage=110&symbol=BTCUSDT&timestamp=1542434791747"
-     ```
+3. Append the sign parameter to request header, and send the HTTP request. Note: the plain text for GET and POST requests is different. Please refer to blew examples.
 
-2. Use the HMAC_SHA256 algorithm to sign the query string in step 1, and convert it to a hex string to obtain the sign parameter.
-
-   - Calculate the signature (take `nodejs` as an example)
-
-     ``` node
-     sign = cryptoJS.HmacSHA256(orderedParams, secret).toString(cryptoJS.enc.Hex)
-     ```
-
-3. Append the sign parameter to the end of the parameters string, and send the HTTP request. Note that the message format for GET and POST requests is different. Please refer to the examples.
-
-   - GET request example
-
-     ``` shell
-     GET /user/leverage?api_key=XXXXXXXXXXX&timestamp=1542434791000&sign=670e3e4aa32b243f2dedf1dafcec2fd17a440e71b05681550416507de591d908 HTTP/1.1
-     Host: openapi-testnet.zoomex.com
-     ```
-
-   - POST request example
-
-     ``` shell
-     POST /user/leverage/save HTTP/1.1
-     Host: openapi-testnet.zoomex.com
-     Content-Type: application/json
-     
-     {
-         "api_key": "XXXXXXXXXXX",
-         "leverage": 100,
-         "symbol": "BTCUSD",
-         "timestamp": 1542434791000,
-         "sign": "670e3e4aa32b243f2dedf1dafcec2fd17a440e71b05681550416507de591d908"
-     }
-     ```
 4. Demo
-      ``` python
-      import requests
-     import time
-     import hashlib
-     import hmac
-     import uuid
+     ``` python
+     import requests
+    import time
+    import hashlib
+    import hmac
+    import uuid
 
-     api_key='XXXXXXXX'
-     secret_key='XXXXXXXX'
-     httpClient=requests.Session()
-     recv_window=str(5000)
-     url="https://openapi-testnet.zoomex.com"
+    api_key='XXXXXXXX'
+    secret_key='XXXXXXXX'
+    httpClient=requests.Session()
+    recv_window=str(5000)
+    url="https://openapi-testnet.zoomex.com"
 
-     def HTTP_Request(endPoint,method,payload,Info):
-         global time_stamp
-         time_stamp=str(int(time.time() * 10 ** 3))
-         signature=genSignature(payload)
-         headers = {
-             'X-BAPI-API-KEY': api_key,
-             'X-BAPI-SIGN': signature,
-             'X-BAPI-SIGN-TYPE': '2',
-             'X-BAPI-TIMESTAMP': time_stamp,
-             'X-BAPI-RECV-WINDOW': recv_window,
-             'Content-Type': 'application/json'
-         }
-         if(method=="POST"):
+    def HTTP_Request(endPoint,method,payload,Info):
+        global time_stamp
+        time_stamp=str(int(time.time() * 10 ** 3))
+        signature=genSignature(payload)
+        headers = {
+            'X-BAPI-API-KEY': api_key,
+            'X-BAPI-SIGN': signature,
+            'X-BAPI-SIGN-TYPE': '2',
+            'X-BAPI-TIMESTAMP': time_stamp,
+            'X-BAPI-RECV-WINDOW': recv_window,
+            'Content-Type': 'application/json'
+        }
+        if(method=="POST"):
             response = httpClient.request(method, url+endPoint, headers=headers, data=payload)
-         else:
+        else:
             response = httpClient.request(method, url+endPoint+"?"+payload, headers=headers)
-         print(response.text)
-         print(Info + " Elapsed Time : " + str(response.elapsed))
-     def genSignature(payload):
-         param_str= str(time_stamp) + api_key + recv_window + payload
-         hash = hmac.new(bytes(secret_key, "utf-8"), param_str.encode("utf-8"),hashlib.sha256)
-         signature = hash.hexdigest()
-         return signature
+        print(response.text)
+        print(Info + " Elapsed Time : " + str(response.elapsed))
+    def genSignature(payload):
+        param_str= time_stamp+ api_key + recv_window + payload
+        hash = hmac.new(bytes(secret_key, "utf-8"), param_str.encode("utf-8"),hashlib.sha256)
+        signature = hash.hexdigest()
+        return signature
 
-     #POST Create Order
-     endpoint="/cloud/trade/v3/order/create"
-     method="POST"
-     orderLinkId=uuid.uuid4().hex
-     params='{"category":"linear","symbol": "BTCUSDT","side": "Buy","positionIdx": 0,"orderType": "Market","qty": "0.001","price": "","timeInForce": "GTC","orderLinkId": "' + orderLinkId + '"}'
-     HTTP_Request(endpoint,method,params,"Create")
+    #POST Create Order
+    endpoint="/cloud/trade/v3/order/create"
+    method="POST"
+    orderLinkId=uuid.uuid4().hex
+    params='{"category":"linear","symbol": "BTCUSDT","side": "Buy","positionIdx": 0,"orderType": "Market","qty": "0.001","price": "","timeInForce": "GTC","orderLinkId": "' + orderLinkId + '"}'
+    HTTP_Request(endpoint,method,params,"Create")
 
-     #GET history Orders
-     endpoint="/cloud/trade/v3/order/history"
-     method="GET"
-     params='category=linear&symbol=BTCUSDT'
-     HTTP_Request(endpoint,method,params,"history")
+    #GET history Orders
+    endpoint="/cloud/trade/v3/order/history"
+    method="GET"
+    params='category=linear&symbol=BTCUSDT'
+    HTTP_Request(endpoint,method,params,"history")
     ```
 
 ## Common response parameters
-
-### Copy Trade
 
 | Parameter | Type | Comments|
 |:----- |:-----|----- |

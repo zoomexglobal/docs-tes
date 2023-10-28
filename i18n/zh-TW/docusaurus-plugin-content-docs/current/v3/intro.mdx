@@ -3,7 +3,7 @@ title: 概覽
 sidebar_name: 概覽
 ---
 
-Zoomex V3 Open API 能給讓用戶基於不同的產品構建API模型。
+Zoomex V3 Open API 能讓用戶基於不同的產品構建API模型。
 
 <!--
 - **衍生品 - 合約：** 您可以通過 `contract/v3` 接口交易_USDT永續_, _反向永續_。
@@ -48,102 +48,65 @@ _server_time - recv_window <= timestamp < server_time + 1000_<br/>
 
 **基本步驟:**
 
-1. 所有參數按照字母順序排序，然後按照 [query string](https://en.wikipedia.org/wiki/Query_string) 格式拼接。
+1. 時間戳 + API key + [recv_window]+ [queryString(無需排序) | jsonBodyString]
 
-   - 拼接參數示例
+2. 使用HMAC_SHA256或者RSA_SHA256算法對第1步中拼接的string簽名，並轉換為16進製字符串(HMAC_SHA256) / Base64編碼 (RSA_SHA256)，得出sign參數
 
-     ``` shell
-     orderedParams = "api_key=XXXXXXXXXXX&buy_leverage=100&sell_leverage=110&symbol=BTCUSDT&timestamp=1542434791747"
-     ```
+3. 添加生成的簽名到HTTP頭當中 注意: GET和POST請求的加密明文是不相同，請參考以下示例
 
-2. 使用 `HMAC_SHA256` 算法對第1步中拼接的query string簽名，並轉換為16進製字符串，得出 `sign` 參數。
-
-   - 計算簽名（以`nodejs`為例）
-
-     ``` node
-     sign = cryptoJS.HmacSHA256(orderedParams, secret).toString(cryptoJS.enc.Hex)
-     ```
-
-3. 將sign參數加到請求參數中即可；註意GET和POST請求參數格式不同，詳見以下示例。
-
-   - GET請求格式：
-
-     ``` shell
-     GET /user/leverage?api_key=XXXXXXXXXXX&timestamp=1542434791000&sign=670e3e4aa32b243f2dedf1dafcec2fd17a440e71b05681550416507de591d908 HTTP/1.1
-     Host: openapi-testnet.zoomex.com
-     ```
-
-   - POST請求格式：
-
-     ``` shell
-     POST /user/leverage/save HTTP/1.1
-     Host: openapi-testnet.zoomex.com
-     Content-Type: application/json
-     
-     {
-         "api_key": "XXXXXXXXXXX",
-         "leverage": 100,
-         "symbol": "BTCUSD",
-         "timestamp": 1542434791000,
-         "sign": "670e3e4aa32b243f2dedf1dafcec2fd17a440e71b05681550416507de591d908"
-     }
-     ```
 4. 示例
-      ``` python
-      import requests
-     import time
-     import hashlib
-     import hmac
-     import uuid
+    ```python
+    import requests
+    import time
+    import hashlib
+    import hmac
+    import uuid
 
-     api_key='XXXXXXXX'
-     secret_key='XXXXXXXX'
-     httpClient=requests.Session()
-     recv_window=str(5000)
-     url="https://openapi-testnet.zoomex.com"
+    api_key='XXXXXXXX'
+    secret_key='XXXXXXXX'
+    httpClient=requests.Session()
+    recv_window=str(5000)
+    url="https://openapi-testnet.zoomex.com"
 
-     def HTTP_Request(endPoint,method,payload,Info):
-         global time_stamp
-         time_stamp=str(int(time.time() * 10 ** 3))
-         signature=genSignature(payload)
-         headers = {
-             'X-BAPI-API-KEY': api_key,
-             'X-BAPI-SIGN': signature,
-             'X-BAPI-SIGN-TYPE': '2',
-             'X-BAPI-TIMESTAMP': time_stamp,
-             'X-BAPI-RECV-WINDOW': recv_window,
-             'Content-Type': 'application/json'
-         }
-         if(method=="POST"):
+    def HTTP_Request(endPoint,method,payload,Info):
+        global time_stamp
+        time_stamp=str(int(time.time() * 10 ** 3))
+        signature=genSignature(payload)
+        headers = {
+            'X-BAPI-API-KEY': api_key,
+            'X-BAPI-SIGN': signature,
+            'X-BAPI-SIGN-TYPE': '2',
+            'X-BAPI-TIMESTAMP': time_stamp,
+            'X-BAPI-RECV-WINDOW': recv_window,
+            'Content-Type': 'application/json'
+        }
+        if(method=="POST"):
             response = httpClient.request(method, url+endPoint, headers=headers, data=payload)
-         else:
+        else:
             response = httpClient.request(method, url+endPoint+"?"+payload, headers=headers)
-         print(response.text)
-         print(Info + " Elapsed Time : " + str(response.elapsed))
-     def genSignature(payload):
-        param_str= str(time_stamp) + api_key + recv_window + payload
-         hash = hmac.new(bytes(secret_key, "utf-8"), param_str.encode("utf-8"),hashlib.sha256)
-         signature = hash.hexdigest()
-         return signature
+        print(response.text)
+        print(Info + " Elapsed Time : " + str(response.elapsed))
+    def genSignature(payload):
+        param_str= time_stamp+ api_key + recv_window + payload
+        hash = hmac.new(bytes(secret_key, "utf-8"), param_str.encode("utf-8"),hashlib.sha256)
+        signature = hash.hexdigest()
+        return signature
 
-     #POST Create Order
-     endpoint="/cloud/trade/v3/order/create"
-     method="POST"
-     orderLinkId=uuid.uuid4().hex
-     params='{"category":"linear","symbol": "BTCUSDT","side": "Buy","positionIdx": 0,"orderType": "Market","qty": "0.001","price": "","timeInForce": "GTC","orderLinkId": "' + orderLinkId + '"}'
-     HTTP_Request(endpoint,method,params,"Create")
+    #POST Create Order
+    endpoint="/cloud/trade/v3/order/create"
+    method="POST"
+    orderLinkId=uuid.uuid4().hex
+    params='{"category":"linear","symbol": "BTCUSDT","side": "Buy","positionIdx": 0,"orderType": "Market","qty": "0.001","price": "","timeInForce": "GTC","orderLinkId": "' + orderLinkId + '"}'
+    HTTP_Request(endpoint,method,params,"Create")
 
-     #GET history Orders
-     endpoint="/cloud/trade/v3/order/history"
-     method="GET"
-     params='category=linear&symbol=BTCUSDT'
-     HTTP_Request(endpoint,method,params,"history")
-        ```
-
+    #GET history Orders
+    endpoint="/cloud/trade/v3/order/history"
+    method="GET"
+    params='category=linear&symbol=BTCUSDT'
+    HTTP_Request(endpoint,method,params,"history")
+    ```
 
 ## Response通用數據結構
-
-### 帶單交易
 
 | 參數 | 類型 | 說明|
 |:----- |:-----|----- |
