@@ -33,13 +33,15 @@ ID to cancel active orders, and if both orderId and orderLinkId are entered in t
 
 - **Open orders up limit:**<br/>
 **Future:** Each account can hold a maximum of _500_ **active** orders simultaneously. This is contract-specific, so the following situation is allowed: _the same account can hold 300 BTCUSD active orders and 280 ETHUSD active orders at the same time._ For **conditional** orders, each account can hold a maximum of **10 active orders** simultaneously. When the upper limit of orders is reached, you can still place orders with parameters of **reduceOnly** or **closeOnTrigger**.<br/>
-**Spot: * * Supports a total of 500 pending orders, including a maximum of 30 stop loss orders.<br/>
-Rules for spot stop loss orders<br/>
-Spot support stop loss orders, but the underlying processing logic is slightly different<br/>
-After the profit stop loss is created, you will receive an order ID When it is triggered, you will receive a brand new order ID
+**Spot: * * Supports a total of 500 pending orders, including a maximum of 30 stop loss orders.
 
 - **Rate limit:**<br/>
 Please refer to [rate limit table](../rate-limit#trade).
+:::
+
+:::info rules for spot stop win and stop loss orders
+Spot goods support stop loss orders, but the processing logic behind them is slightly different<br/>
+After the profit stop loss is created, you will receive an order ID When it is triggered, you will receive a brand new order ID<br/>
 :::
 
 
