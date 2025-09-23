@@ -51,11 +51,12 @@ POST `/cloud/trade/v3/order/create`
 ### Request Parameters
 | Parameter | Required | Type | Comments|
 |:----- |:-------|:-----|------ |
-|category |**true** |string |Product type <ul><li>Normal account: `spot`, `linear`, `inverse`</li></ul> |
+|category |**true** |string |Product type <ul><li>UTA: `spot`, `linear`, `inverse`</li><li>Normal account: `spot`, `linear`, `inverse`</li></ul> |
 |symbol |**true** |string |Symbol name|
 |side |**true** |string |`Buy`, `Sell`|
 |orderType |**true** |string |`Market`, `Limit`|
-|qty |**true** |string |Order quantity. <ul><li>Spot: The qty for buying at market price is always measured in quote coins, and in other cases, qty is measured in base coins</li><li>Futures: qty is always measured in base coins</li></ul> please note that qty should be quote curreny amount|
+|qty |**true** |string |Order quantity. <ul><li>UTA account<ul><li>Spot: set `marketUnit` for market order qty unit, `quoteCoin` for market buy by default, `baseCoin` for market sell by default</li><li>Futures: always use base coin as unit</li></ul></li><li>Classic account<ul><li>Spot: the unit of qty is quote coin for market buy order, for others, it is base coin</li><li>Futures: always use base coin as unit</li></ul></li></ul>|
+|marketUnit |false |string |The unit for `qty` when create **Spot market** orders for **UTA account**. Currently, TP/SL and conditional orders are not supported.<li>`baseCoin`: for example, buy BTCUSDT, then "qty" unit is BTC</li><li>`quoteCoin`: for example, sell BTCUSDT, then "qty" unit is USDT</li>|
 |price |false |string |Order price. If you have net position, price needs to be greater than liquidation price |
 |triggerDirection |false |integer |Conditional order param. Used to identify the expected direction of the conditional order. <ul><li>`1`: triggered when market price rises to `triggerPrice`</li><li>`2`: triggered when market price falls to `triggerPrice`</li> </ul><br/>Only valid for linear and inverse|
 |orderFilter |false |string |Specify the order variety Order: regular order, tpslOrder: stop loss order If not transmitted, the default is Order, which is only valid for spot goods|
