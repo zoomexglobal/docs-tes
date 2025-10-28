@@ -18,7 +18,7 @@ GET `/cloud/trade/v3/account/wallet-balance`
 |:----- |:-----|----- |
 |list |array |Object |
 |> accountType |string |帳戶類型 |
-|> accountIMRate |string |帳戶初始保證金率 <li>下面所有帳戶維度的字段都<b>不適用於</b><br/>統一帳戶(逐倉模式), <br/>經典帳戶(CONTRACT)</li>|
+|> accountIMRate |string |帳戶初始保證金率 <li>下面所有帳戶維度的字段都<b>不適用於</b><br/>交易帳戶(逐倉模式), <br/>經典帳戶(CONTRACT)</li>|
 |> accountMMRate |string |帳戶維持保證金率|
 |> totalEquity |string |賬戶維度換算成usd的資產淨值：Account Margin Balance Base Coin + Account Option Value Base Coin。|
 |> totalWalletBalance |string |賬戶維度換算成usd的產錢包餘額：∑ Asset Wallet Balance By USD value of each asset。|
