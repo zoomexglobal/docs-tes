@@ -20,7 +20,7 @@ GET `/cloud/trade/v3/position/list`
 ### 請求參數
 | 參數 | 是否必需 | 類型 | 說明|
 |:----- |:-------|:-----|------ |
-|[category](../v3/enum#category) |**true** |string |產品類型 <ul><li>统一交易账户：`linear`, `inverse`</li><li>普通帳戶: `linear`, `inverse`. 這裡`category`字段不參與業務邏輯，僅做路由使用</li></ul> |
+|[category](../v3/enum#category) |**true** |string |產品類型 <ul><li>交易帳戶：`linear`, `inverse`</li><li>普通帳戶: `linear`, `inverse`. 這裡`category`字段不參與業務邏輯，僅做路由使用</li></ul> |
 |symbol |false |string |合約名稱<ul><li>若傳了`symbol`, 則不管是否有倉位都返回該symbol數據</li><li>若`symbol`不傳但傳了`settleCoin`, 則僅返回有實際倉位的數據</li></ul>|
 |baseCoin |false |string |交易幣種. |
 |settleCoin |false |string |結算幣種. 對於期貨而言，`symbol`和`settleCon`**必傳**其中一個, 若都傳，則`symbol`有更高的優先級 |
