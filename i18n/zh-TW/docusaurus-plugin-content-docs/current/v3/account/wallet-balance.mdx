@@ -10,7 +10,7 @@ GET `/cloud/trade/v3/account/wallet-balance`
 ### 請求參數
 | 參數 | 是否必需 | 類型 | 說明|
 |:----- |:-------|:-----|------ |
-|[accountType](../enum#accounttype) |**true** |string |帳戶類型. <ul><li>統一类型帳戶: `UNIFIED`</li><li>經典帳戶: `CONTRACT`(合約錢包)</li></ul>|
+|[accountType](../enum#accounttype) |**true** |string |帳戶類型. <ul><li>交易帳戶: `UNIFIED`</li><li>經典帳戶: `CONTRACT`(合約錢包)</li></ul>|
 |coin |false |string |幣種名稱 <ul><li>不傳則返回非零資產信息</li><li>可以傳多個幣進行查詢，以逗號分隔</li></ul>|
 
 ### 響應參數
