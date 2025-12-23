@@ -1,22 +1,18 @@
 ---
-title: Get Order History
-sidebar_label: Get Order History (2 years)
+title: Get Pre-upgrade Order History
+sidebar_label: Get Pre-upgrade Order History
 sidebar_position: 6
 ---
 
-Query order history. As order creation/cancellation is **asynchronous**, the data returned from this endpoint may delay. If you want to get
-real-time order information, you could query this [endpoint](open-order#) or rely on the [websocket stream](../websocket/private/order) (recommended).
-> **Normal account covers: USDT perpetual / Inverse contract**
+After the account is upgraded to a Unified account, you can get the orders which occurred before the upgrade.
 
 :::info
-* The orders in the last 7 days: supports querying all statuses
-* The orders beyond 7 days: supports querying filled orders
-* If no time is specified, the data from the last 7 days will be returned by default, You can query by symbol, baseCoin, orderId and orderLinkId, and if you pass multiple params, the system will process them according to this priority: orderId > orderLinkId > symbol.
-* Trading account(except inverse) support querying the past 2 years data.
+* can get all status in 7 days
+* can only get filled orders beyond 7 days
 :::
 
 ### HTTP Request
-GET `/cloud/trade/v3/order/history`
+GET `/cloud/trade/v3/pre-upgrade/order/history`
 
 ### Request Parameters
 | Parameter | Required | Type | Comments|
@@ -47,7 +43,7 @@ GET `/cloud/trade/v3/order/history`
 |> [orderStatus](../enum#orderstatus) |string |Order status |
 |> [cancelType](../enum#canceltype) |string |Cancel type |
 |> [rejectReason](../enum#rejectreason) |string |Reject reason.|
-|> avgPrice |string |Average filled price. If unfilled, it is `""` |
+|> avgPrice |string |Average filled price. If unfilled, it is "", and also for those orders have partilly filled but cancelled at the end |
 |> leavesQty |string |The remaining qty not executed.|
 |> leavesValue |string |The estimated value not executed.|
 |> cumExecQty |string |Cumulative executed order qty |
@@ -79,7 +75,7 @@ GET `/cloud/trade/v3/order/history`
 ### Request Example
 
 ```shell
-GET /cloud/trade/v3/order/history?category=linear&limit=1 HTTP/1.1
+GET /cloud/trade/v3/pre-upgrade/order/history?category=linear&limit=1 HTTP/1.1
 Host: openapi-testnet.zoomex.com
 X-BAPI-SIGN: XXXXX
 X-BAPI-API-KEY: XXXXX
