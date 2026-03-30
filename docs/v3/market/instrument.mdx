@@ -116,7 +116,8 @@ GET `/cloud/trade/v3/market/instruments-info`
             <td>> settleCoin</td><td>string</td><td>Settle coin </td>
         </tr>
         <tr>
-            <td>> offlineTime</td><td>string</td><td>Offline timestamp (ms) </td>
+            <td>> offlineTime</td><td>string</td><td>offline time of the currency pair, UTC time.
+            If the symbol is not listed or is in use, it will return empty; if it is about to be offline, it will return the offline time </td>
         </tr>
     </table>
 </TabItem>
