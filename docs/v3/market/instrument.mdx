@@ -62,9 +62,6 @@ GET `/cloud/trade/v3/market/instruments-info`
             <td>> launchTime</td><td>string</td><td>Launch timestamp (ms) </td>
         </tr>
         <tr>
-            <td>> offlineTime</td><td>string</td><td>Offline timestamp (ms) </td>
-        </tr>
-        <tr>
             <td>> priceScale</td><td>string</td><td>Price scale </td>
         </tr>
         <tr>
@@ -117,6 +114,9 @@ GET `/cloud/trade/v3/market/instruments-info`
         </tr>
         <tr>
             <td>> settleCoin</td><td>string</td><td>Settle coin </td>
+        </tr>
+        <tr>
+            <td>> offlineTime</td><td>string</td><td>Offline timestamp (ms) </td>
         </tr>
     </table>
 </TabItem>
@@ -180,6 +180,9 @@ GET `/cloud/trade/v3/market/instruments-info`
         <tr>
             <td>>> marketParameter</td><td>string</td><td>Price limit on Market order. <i>For example, assuming the market order limit for MNT/USDT is 5%. When the last traded price is at 2 USDT, a trader places a market order for 100,000 USDT. Any portion that could have been filled at above 2.1 USDT will be canceled. Assuming only 80,000 USDT order value can be filled at a price of 2.1 USDT or below, the remaining 20,000 USDT order value will be canceled since the deviation exceeds the 5% threshold.</i></td>
         </tr>
+        <tr>
+            <td>> offlineTime</td><td>string</td><td>Offline timestamp (ms) </td>
+        </tr>
     </table>
 </TabItem>
 
@@ -241,7 +244,6 @@ Host: openapi-testnet.zoomex.com
                 "baseCoin": "BTC",
                 "quoteCoin": "USDT",
                 "launchTime": "1585526400000",
-                "offlineTime": "0",
                 "deliveryTime": "0",
                 "deliveryFeeRate": "",
                 "priceScale": "2",
@@ -264,7 +266,8 @@ Host: openapi-testnet.zoomex.com
                 },
                 "unifiedMarginTrade": true,
                 "fundingInterval": 480,
-                "settleCoin": "USDT"
+                "settleCoin": "USDT",
+                "offlineTime": "0"
             }
         ],
         "nextPageCursor": ""
@@ -304,7 +307,8 @@ Host: openapi-testnet.zoomex.com
                 "riskParameters": {
                     "limitParameter": "0.05",
                     "marketParameter": "0.05"
-                }
+                },
+                "offlineTime": "0"
             }
         ]
     },
