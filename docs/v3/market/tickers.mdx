@@ -75,6 +75,12 @@ GET `/cloud/trade/v3/market/tickers`
             <td>> fundingRate</td><td>string</td><td>Funding rate </td>
         </tr>
         <tr>
+            <td>> fundingIntervalHour</td><td>string</td><td>Funding interval hour<ul><li>This value currently only supports whole hours</li></ul></td>
+        </tr>
+        <tr>
+            <td>> fundingCap</td><td>string</td><td>Funding rate upper and lower limits</td>
+        </tr>
+        <tr>
             <td>> nextFundingTime</td><td>string</td><td>Next funding time (ms) </td>
         </tr>
         <tr>
@@ -178,6 +184,8 @@ Host: openapi-testnet.zoomex.com
     "turnover24h": "2352.94950046",
     "volume24h": "49337318",
     "fundingRate": "-0.001034",
+    "fundingIntervalHour": "8",
+    "fundingCap": "0.00375,-0.00375",
     "nextFundingTime": "1672387200000",
     "predictedDeliveryPrice": "",
     "basisRate": "",
