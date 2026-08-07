@@ -6,13 +6,12 @@ sidebar_position: 6
 
 Query order history. As order creation/cancellation is **asynchronous**, the data returned from this endpoint may delay. If you want to get
 real-time order information, you could query this [endpoint](open-order#) or rely on the [websocket stream](../websocket/private/order) (recommended).
-> **Normal account covers: USDT perpetual / Inverse contract**
+> **Trading products covered: Spot / Linear/Inverse**
 
 :::info
-* The orders in the last 7 days: supports querying all statuses
-* The orders beyond 7 days: supports querying filled orders
-* If no time is specified, the data from the last 7 days will be returned by default, You can query by symbol, baseCoin, orderId and orderLinkId, and if you pass multiple params, the system will process them according to this priority: orderId > orderLinkId > symbol.
-* Trading account(except inverse) support querying the past 2 years data.
+* **The orders in the last 7 days:**: <br/> support querying all closed status except "Cancelled", "Rejected", "Deactivated" status
+* **The orders in the last 24 hours:**: <br/>the orders with "Cancelled" (fully cancelled order), "Rejected", "Deactivated" can be query
+* **The orders beyond 7 days:**: supports querying orders which have fills only, i.e., fully filled, partial filled but cancelled orders
 :::
 
 ### HTTP Request
@@ -21,7 +20,7 @@ GET `/cloud/trade/v3/order/history`
 ### Request Parameters
 | Parameter | Required | Type | Comments|
 |:----- |:-------|:-----|------ |
-|[category](../enum#category) |**true** |string |Product type <ul><li>Trading account: `linear`, `inverse`, `spot`</li><li>Normal account: `linear`, `inverse`, `spot`</li></ul> |
+|[category](../enum#category) |**true** |string |Product type: `spot`, `linear`, `inverse` |
 |symbol |false |string |Symbol name|
 |orderId |false |string |Order ID |
 |orderLinkId |false |string |User customised order ID |
@@ -47,7 +46,7 @@ GET `/cloud/trade/v3/order/history`
 |> [orderStatus](../enum#orderstatus) |string |Order status |
 |> [cancelType](../enum#canceltype) |string |Cancel type |
 |> [rejectReason](../enum#rejectreason) |string |Reject reason.|
-|> avgPrice |string |Average filled price. If unfilled, it is `""` |
+|> avgPrice |string |Average filled price, returns "" for those orders without avg price |
 |> leavesQty |string |The remaining qty not executed.|
 |> leavesValue |string |The estimated value not executed.|
 |> cumExecQty |string |Cumulative executed order qty |

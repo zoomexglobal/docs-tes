@@ -11,10 +11,14 @@ POST `/cloud/trade/v3/position/set-margin-mode`
 ### 請求參數
 | 參數 | 是否必需 | 類型 | 說明|
 |:----- |:-------|:-----|------ |
-|setMarginMode |**true** |string |<ul><li>`ISOLATED_MARGIN`(逐倉保證金模式)</li><li>`REGULAR_MARGIN`（全倉保證金模式）</li><li>`PORTFOLIO_MARGIN`（組合保證金模式）</li></ul> |
+|setMarginMode |**true** |string |<ul><li>`ISOLATED_MARGIN`(逐倉保證金模式)</li><li>`REGULAR_MARGIN`（全倉保證金模式）</li></ul> |
 
 ### 響應參數
-無
+| 參數 | 類型 | 說明|
+|:----- |:-----|----- |
+|reasons |array |Object. 請求成功時返回空數組 |
+|> reasonCode |string |失敗錯誤碼 |
+|> reasonMsg |string |失敗錯誤信息 |
 
 ---
 
@@ -38,10 +42,15 @@ Content-Type: application/json
 
 ```json
 {
-    "retCode": 0,
-    "retMsg": "OK",
-    "result": {},
-    "retExtInfo": {},
-    "time": 1672281607343
+    "retCode": 3400045,
+    "retMsg": "Set margin mode failed",
+    "result": {
+        "reasons": [
+            {
+                "reasonCode": "3400000",
+                "reasonMsg": "Equity needs to be equal to or greater than 1000 USDC"
+            }
+        ]
+    }
 }
 ```
