@@ -34,7 +34,7 @@ X-BAPI-RECV-WINDOW: 5000
 Content-Type: application/json
 
 {
-    "setMarginMode": "PORTFOLIO_MARGIN"
+    "setMarginMode": "REGULAR_MARGIN"
 }
 ```
 
@@ -42,15 +42,10 @@ Content-Type: application/json
 
 ```json
 {
-    "retCode": 3400045,
-    "retMsg": "Set margin mode failed",
+    "retCode": 0,
+    "retMsg": "OK",
     "result": {
-        "reasons": [
-            {
-                "reasonCode": "3400000",
-                "reasonMsg": "Equity needs to be equal to or greater than 1000 USDC"
-            }
-        ]
+        "reasons": []
     }
 }
 ```
