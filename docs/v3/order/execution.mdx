@@ -41,7 +41,7 @@ GET `/cloud/trade/v3/execution/list`
 |> side |string |Side. `Buy`,`Sell` |
 |> orderPrice |string |Order price |
 |> orderQty |string |Order qty |
-|> leavesQty |string |Create an unexecuted order quantity, `spot` trading is not supported |
+|> leavesQty |string |Create an unexecuted order quantity.|
 |> [createType](../enum#createtype) |string |Order creation type: `Spot` do not return this field |
 |> [orderType](../enum#ordertype) |string |Order type. `Market`,`Limit` |
 |> [stopOrderType](../enum#stopordertype) |string |Stop order type. If the order is not stop order, it either returns `UNKNOWN` or `""`. _`spot` is not supported_ |
