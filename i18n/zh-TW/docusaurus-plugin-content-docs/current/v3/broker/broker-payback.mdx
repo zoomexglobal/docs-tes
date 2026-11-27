@@ -1,0 +1,117 @@
+---
+title: 查詢代理商直客返現明細
+sidebar_label: 查詢代理商直客返現明細
+sidebar_position: 9
+---
+
+使用 Testnet 代理商 API Key 查詢目前直屬客戶的訂單返現明細。明細依成交日期倒序排列，包含待結算訂單。時間篩選依返現日彙總的最後更新時間。
+
+> API 頻率限制：每秒 5 次
+
+### HTTP 請求
+
+GET `/private/v1/broker/payback`
+
+### 請求參數
+
+| 參數 | 是否必需 | 類型 | 說明 |
+|:-----|:---------|:-----|:-----|
+| uid | false | string | 直客 UID，須為不大於 `2147483647` 的十進位正整數。不傳則查詢目前所有直屬客戶。 |
+| category | false | string | 產品類型，可傳 `spot`（現貨）、`linear`（正向合約）或 `inverse`（反向合約）。不傳則查詢上述三類產品。 |
+| coin | false | string | 單一幣種，不區分大小寫。不傳則涵蓋所有適用幣種。`linear` 支援 `USDT`。`inverse` 支援 `BTC`、`ETH`、`XRP`、`EOS`。 |
+| start | false | integer | 返現日彙總更新時間下限，Unix 毫秒時間戳，包含該時刻。不傳則無下限。 |
+| end | false | integer | 返現日彙總更新時間上限，Unix 毫秒時間戳，不包含該時刻。不傳則無上限。兩者皆傳時，`start` 須小於 `end`。 |
+| limit | false | integer | 每頁最多回傳的訂單明細數。範圍為 `1–50`，預設 `20`。 |
+| cursor | false | string | 首頁不傳。查詢下一頁時，原樣傳入上一頁的 `next_cursor`，並維持相同的篩選條件。 |
+
+### 回應參數
+
+以下欄位位於 `result`。
+
+| 參數 | 類型 | 說明 |
+|:-----|:-----|:-----|
+| list | array | 訂單返現明細。有效查詢無符合紀錄時回傳 `[]`。 |
+| > uid | string | 直客 UID。 |
+| > category | string | 產品類型，為 `spot`、`linear` 或 `inverse`。 |
+| > coin | string | 返現幣種。 |
+| > rate | string | 返現比例，以百分數字串表示。例如 `"20"` 表示 20%。 |
+| > amount | string | 該筆訂單的計算返現金額，以回傳幣種的十進位字串表示。 |
+| > order_id | string | 交易訂單 ID。 |
+| > fee | string | 這筆明細所對應成交的交易手續費合計，以回傳幣種的十進位字串表示。 |
+| > time | string | 返現日彙總最後更新時間，為 Unix 毫秒時間戳字串。 |
+| > status | integer | 結算狀態。`1` 為待結算，`2` 為已結算，`3` 為資料異常。 |
+| next_cursor | string | 下一頁游標。空字串表示已無符合條件的後續紀錄。 |
+
+### 錯誤碼
+
+| ret_code | 說明 |
+|:---------|:-----|
+| 100 | 伺服器錯誤。 |
+| 200 | 篩選條件、每頁筆數或游標無效。若指定的合約類型不支援所傳幣種，`ret_msg` 為 `查询结果为空`。 |
+| 201 | 代理商帳戶不存在。 |
+| 205 | 指定的 UID 目前並非該代理商的直屬客戶。 |
+| 10001 | 請求參數格式錯誤，例如 `limit` 不是整數。 |
+
+### 請求範例
+
+```python
+import hashlib
+import hmac
+import time
+
+import requests
+
+api_key = "YOUR_TESTNET_AFFILIATE_API_KEY"
+api_secret = "YOUR_TESTNET_AFFILIATE_API_SECRET"
+url = "https://openapi-testnet.zoomex.com/private/v1/broker/payback"
+
+params = {
+    "category": "linear",
+    "coin": "USDT",
+    "limit": 20,
+    "api_key": api_key,
+    "timestamp": str(int(time.time() * 1000)),
+    "recv_window": "5000",
+}
+payload = "&".join(f"{key}={params[key]}" for key in sorted(params))
+signature = hmac.new(api_secret.encode(), payload.encode(), hashlib.sha256).hexdigest()
+
+params["sign"] = signature
+headers = {
+    "X-BAPI-API-KEY": api_key,
+    "X-BAPI-SIGN": signature,
+    "X-BAPI-TIMESTAMP": params["timestamp"],
+    "X-BAPI-RECV-WINDOW": params["recv_window"],
+}
+
+response = requests.get(url, params=params, headers=headers, timeout=10)
+print(response.json())
+```
+
+### 回應範例
+
+```json
+{
+  "ret_code": 0,
+  "ret_msg": "OK",
+  "ext_code": "",
+  "result": {
+    "list": [
+      {
+        "uid": "12345678",
+        "category": "linear",
+        "coin": "USDT",
+        "rate": "20",
+        "amount": "0.2",
+        "order_id": "00000000-0000-4000-8000-000000000001",
+        "fee": "1",
+        "time": "1793498400123",
+        "status": 2
+      }
+    ],
+    "next_cursor": ""
+  },
+  "ext_info": null,
+  "time_now": 1793498460123
+}
+```

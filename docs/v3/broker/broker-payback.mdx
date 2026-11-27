@@ -1,0 +1,117 @@
+---
+title: Get direct customer payback records
+sidebar_label: Get direct customer payback records
+sidebar_position: 9
+---
+
+Use a Testnet Affiliate API key to query order-level cashback for your current direct customers. Records are ordered by trading date in descending order and include orders pending settlement. The time filters apply to the last update of the daily payback summary.
+
+> API rate limit: 5 req / sec
+
+### HTTP Request
+
+GET `/private/v1/broker/payback`
+
+### Request Parameters
+
+| Parameter | Required | Type | Comments |
+|:----------|:---------|:-----|:---------|
+| uid | false | string | Direct customer UID as a positive decimal integer up to `2147483647`. Omit to query all current direct customers. |
+| category | false | string | Product type. Use `spot`, `linear`, or `inverse`. Omit to query all three. |
+| coin | false | string | One coin, case-insensitive. Omit to include all eligible coins. `linear` supports `USDT`. `inverse` supports `BTC`, `ETH`, `XRP`, and `EOS`. |
+| start | false | integer | Inclusive lower bound for the summary update time, in Unix milliseconds. Omit for no lower bound. |
+| end | false | integer | Exclusive upper bound for the summary update time, in Unix milliseconds. Omit for no upper bound. If both times are provided, `start` must be less than `end`. |
+| limit | false | integer | Maximum order records per page. Range `1–50`, default `20`. |
+| cursor | false | string | Omit on the first request. For the next page, pass the previous `next_cursor` unchanged and keep the same filters. |
+
+### Response Parameters
+
+The following fields are in `result`.
+
+| Parameter | Type | Comments |
+|:----------|:-----|:---------|
+| list | array | Order-level cashback records. An eligible query with no matching records returns `[]`. |
+| > uid | string | Direct customer UID. |
+| > category | string | Product type. One of `spot`, `linear`, and `inverse`. |
+| > coin | string | Cashback coin. |
+| > rate | string | Cashback rate as a percentage. For example, `"20"` means 20%. |
+| > amount | string | Calculated order cashback amount as a decimal string in the returned coin. |
+| > order_id | string | Trading order ID. |
+| > fee | string | Sum of the trading fees for the fills associated with the record, as a decimal string in the returned coin. |
+| > time | string | Last update time of the daily payback summary, as a Unix millisecond string. |
+| > status | integer | Settlement status. `1` = pending settlement, `2` = settled, `3` = data error. |
+| next_cursor | string | Opaque cursor for the next page. An empty string means there are no more matching records. |
+
+### Error Codes
+
+| ret_code | Meaning |
+|:---------|:--------|
+| 100 | Server error. |
+| 200 | Invalid filter, page size, or cursor. When an explicitly selected contract category does not support the supplied coin, `ret_msg` is `查询结果为空`. |
+| 201 | Affiliate account does not exist. |
+| 205 | The supplied UID is not a current direct customer of the affiliate. |
+| 10001 | Malformed request parameter, such as a non-integer value for `limit`. |
+
+### Request Example
+
+```python
+import hashlib
+import hmac
+import time
+
+import requests
+
+api_key = "YOUR_TESTNET_AFFILIATE_API_KEY"
+api_secret = "YOUR_TESTNET_AFFILIATE_API_SECRET"
+url = "https://openapi-testnet.zoomex.com/private/v1/broker/payback"
+
+params = {
+    "category": "linear",
+    "coin": "USDT",
+    "limit": 20,
+    "api_key": api_key,
+    "timestamp": str(int(time.time() * 1000)),
+    "recv_window": "5000",
+}
+payload = "&".join(f"{key}={params[key]}" for key in sorted(params))
+signature = hmac.new(api_secret.encode(), payload.encode(), hashlib.sha256).hexdigest()
+
+params["sign"] = signature
+headers = {
+    "X-BAPI-API-KEY": api_key,
+    "X-BAPI-SIGN": signature,
+    "X-BAPI-TIMESTAMP": params["timestamp"],
+    "X-BAPI-RECV-WINDOW": params["recv_window"],
+}
+
+response = requests.get(url, params=params, headers=headers, timeout=10)
+print(response.json())
+```
+
+### Response Example
+
+```json
+{
+  "ret_code": 0,
+  "ret_msg": "OK",
+  "ext_code": "",
+  "result": {
+    "list": [
+      {
+        "uid": "12345678",
+        "category": "linear",
+        "coin": "USDT",
+        "rate": "20",
+        "amount": "0.2",
+        "order_id": "00000000-0000-4000-8000-000000000001",
+        "fee": "1",
+        "time": "1793498400123",
+        "status": 2
+      }
+    ],
+    "next_cursor": ""
+  },
+  "ext_info": null,
+  "time_now": 1793498460123
+}
+```
